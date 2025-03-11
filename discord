@@ -54,6 +54,8 @@ EOL
 
 chmod +x /usr/local/bin/discord-updater
 
+sudo chown $USER:$USER /usr/share/applications/discord.desktop
+
 sudo chown $USER:$USER /usr/local/bin/discord-updater
 
 sudo chown $USER:$USER /usr/local/bin/discord.desktop
