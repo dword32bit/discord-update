@@ -1,8 +1,9 @@
 # Discord Auto-Updater Script
 
 ## Overview
+-
 This Bash script automates the process of downloading, installing, and launching Discord on Linux. It ensures that Discord is always updated before launching by modifying the `.desktop` file and adding an update script.
------
+-
 Installation from GitHub only once, the rest will run without having to modify, because it has been modified after the update
 
 ## Features
