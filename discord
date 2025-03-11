@@ -1,0 +1,19 @@
+#!/bin/bash
+
+URL="https://discord.com/api/download/stable?platform=linux&format=deb"
+FILENAME="/tmp/$(basename "$URL")"
+
+wget -O "$FILENAME" "$URL"
+if [ $? -ne 0 ]; then
+    echo "Download Failed!"
+    exit 1
+fi
+
+dpkg -i "$FILENAME"
+if [ $? -ne 0 ]; then
+    echo "Installation Failed! Try 'apt --fix-broken install' to fix error."
+    exit 1
+fi
+
+rm -f "$FILENAME"
+echo "Discord Installation/Update Installed"
