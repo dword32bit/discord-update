@@ -9,8 +9,7 @@ if [ ! -f "$BACKUP_FILE" ]; then
     cp "$DESKTOP_FILE" "$BACKUP_FILE"
 fi
 
-echo "Modifying $DESKTOP_FILE to run updater before Discord..."
-cat > "$DESKTOP_FILE" <<EOL
+cat > /usr/local/bin/discord.desktop <<EOL
 [Desktop Entry]
 Name=Discord
 StartupWMClass=discord
@@ -22,6 +21,8 @@ Type=Application
 Categories=Network;InstantMessaging;
 Path=/usr/bin
 EOL
+
+cp /usr/local/bin/discord.desktop "$DESKTOP_FILE"
 
 cat > /usr/local/bin/discord-updater <<EOL
 #!/bin/bash
@@ -48,11 +49,13 @@ fi
 rm -f "$FILENAME"
 echo "Discord Updated! Launching..."
 
-cp "$BACKUP_FILE" "$DESKTOP_FILE"
-
 exec /usr/share/discord/Discord
 EOL
 
 chmod +x /usr/local/bin/discord-updater
+
+sudo chown $USER:$USER /usr/local/bin/discord-updater
+
+sudo chown $USER:$USER /usr/local/bin/discord.desktop
 
 echo "Discord launcher modified to always update before launching."
