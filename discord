@@ -1,19 +1,58 @@
 #!/bin/bash
 
 URL="https://discord.com/api/download/stable?platform=linux&format=deb"
-FILENAME="/tmp/$(basename "$URL")"
+FILENAME="/tmp/discord.deb"
+DESKTOP_FILE="/usr/share/applications/discord.desktop"
+BACKUP_FILE="/usr/share/applications/discord.desktop.bak"
+
+if [ ! -f "$BACKUP_FILE" ]; then
+    cp "$DESKTOP_FILE" "$BACKUP_FILE"
+fi
+
+echo "Modifying $DESKTOP_FILE to run updater before Discord..."
+cat > "$DESKTOP_FILE" <<EOL
+[Desktop Entry]
+Name=Discord
+StartupWMClass=discord
+Comment=All-in-one voice and text chat for gamers that's free, secure, and works on both your desktop and phone.
+GenericName=Internet Messenger
+Exec=pkexec /usr/local/bin/discord-updater
+Icon=discord
+Type=Application
+Categories=Network;InstantMessaging;
+Path=/usr/bin
+EOL
+
+cat > /usr/local/bin/discord-updater <<EOL
+#!/bin/bash
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "This script must be run as root!"
+    exit 1
+fi
 
 wget -O "$FILENAME" "$URL"
 if [ $? -ne 0 ]; then
-    echo "Download Failed!"
-    exit 1
+    echo "Download Failed! Running Discord without update."
+    exec /usr/share/discord/Discord
+    exit 0
 fi
 
 dpkg -i "$FILENAME"
 if [ $? -ne 0 ]; then
-    echo "Installation Failed! Try 'apt --fix-broken install' to fix error."
-    exit 1
+    echo "Installation Failed! Try 'apt --fix-broken install' to fix errors."
+    exec /usr/share/discord/Discord
+    exit 0
 fi
 
 rm -f "$FILENAME"
-echo "Discord Installation/Update Installed"
+echo "Discord Updated! Launching..."
+
+cp "$BACKUP_FILE" "$DESKTOP_FILE"
+
+exec /usr/share/discord/Discord
+EOL
+
+chmod +x /usr/local/bin/discord-updater
+
+echo "Discord launcher modified to always update before launching."
